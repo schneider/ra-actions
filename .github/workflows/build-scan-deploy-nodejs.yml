@@ -6,7 +6,20 @@ on:
       - main
 
 jobs:
+ security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: monitor
+          args: --severity-threshold=high
+
  build:
+    needs: security
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -21,18 +34,6 @@ jobs:
         run: npm test
       - name: Build package
         run: npm run build
-
- security:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
-      - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/node@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          command: monitor
           
  deploy:
     needs: [build, security]
@@ -49,5 +50,5 @@ jobs:
         run: npm install
       - name: Publish to npm
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: 
         run: npm publish
