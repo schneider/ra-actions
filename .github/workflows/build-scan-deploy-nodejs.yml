@@ -54,6 +54,6 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Publish to npm
-        run: npm publish --access 
+        run: npm publish --access public
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
